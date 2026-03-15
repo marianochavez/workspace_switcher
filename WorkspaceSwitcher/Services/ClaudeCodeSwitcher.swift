@@ -80,14 +80,28 @@ struct ClaudeCodeSwitcher {
 
     /// Activates the given Claude Code account by writing its token into the Keychain.
     /// Uses /usr/bin/security CLI to bypass ACL restrictions on the item.
+    ///
+    /// Important: We must delete ALL existing items for the service first, then add
+    /// the new one. Using `-U` alone only matches by service+account, so switching
+    /// from accountA to accountB would leave accountA's item in place and add a
+    /// second item — Claude CLI then reads whichever comes first (the old one).
     static func switchTo(account keychainAccount: String, tokenData: Data) throws {
         guard let jsonString = String(data: tokenData, encoding: .utf8) else {
             throw ClaudeCodeError.invalidTokenData
         }
-        // -U = update if exists, otherwise add
+        // Remove all existing credentials for this service so Claude CLI
+        // doesn't pick up a stale item from a different account.
+        let existingItems = KeychainService.listItems(service: keychainService)
+        for item in existingItems {
+            try? Shell.run(securityPath, args: [
+                "delete-generic-password",
+                "-s", keychainService,
+                "-a", item.account
+            ])
+        }
+        // Add the new credential
         try Shell.run(securityPath, args: [
             "add-generic-password",
-            "-U",
             "-s", keychainService,
             "-a", keychainAccount,
             "-w", jsonString
