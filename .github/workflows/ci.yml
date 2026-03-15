@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project WorkspaceSwitcher.xcodeproj \
+            -scheme WorkspaceSwitcher \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="-" \
+            | xcpretty || true
+
+      - name: Test
+        run: |
+          xcodebuild test \
+            -project WorkspaceSwitcher.xcodeproj \
+            -scheme WorkspaceSwitcherTests \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="-" \
+            | xcpretty || true

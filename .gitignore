@@ -1,0 +1,24 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserdata
+*.xcworkspace/xcuserdata/
+xcuserdata/
+
+# Archives
+*.xcarchive
+
+# Build artifacts
+*.dmg
+*.app
+*.dSYM.zip
+*.dSYM
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Ruby gems (used for xcodeproj)
+vendor/
+.bundle/

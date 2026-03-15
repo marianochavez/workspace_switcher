@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build DMG & Create Release
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
+      - name: Run tests
+        run: |
+          xcodebuild test \
+            -project WorkspaceSwitcher.xcodeproj \
+            -scheme WorkspaceSwitcherTests \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="-"
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set build version
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${{ steps.version.outputs.VERSION }}" \
+            WorkspaceSwitcher/Info.plist 2>/dev/null || \
+          /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string ${{ steps.version.outputs.VERSION }}" \
+            WorkspaceSwitcher/Info.plist 2>/dev/null || true
+
+      - name: Build DMG
+        run: |
+          chmod +x scripts/build-dmg.sh
+          ./scripts/build-dmg.sh
+
+      - name: Rename DMG with version
+        run: mv build/WorkspaceSwitcher.dmg build/WorkspaceSwitcher-${{ steps.version.outputs.VERSION }}.dmg
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: WorkspaceSwitcher v${{ steps.version.outputs.VERSION }}
+          draft: false
+          generate_release_notes: true
+          files: build/WorkspaceSwitcher-*.dmg
