@@ -18,7 +18,11 @@ struct SwitcherService {
                         throw NSError(domain: "SwitcherService", code: 1,
                                       userInfo: [NSLocalizedDescriptionKey: "No token snapshot saved for \(payload.label). Re-discover this account."])
                     }
-                    try ClaudeCodeSwitcher.switchTo(account: payload.keychainAccount, tokenData: tokenData)
+                    try ClaudeCodeSwitcher.switchTo(
+                        account: payload.keychainAccount,
+                        tokenData: tokenData,
+                        oauthAccountData: payload.oauthAccountSnapshot
+                    )
 
                 case .gitHub(let payload):
                     try GitHubSwitcher.switchTo(username: payload.username, hostname: payload.hostname)
