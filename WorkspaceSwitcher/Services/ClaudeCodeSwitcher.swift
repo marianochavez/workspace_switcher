@@ -51,12 +51,13 @@ struct ClaudeCodeSwitcher {
     struct DiscoveredAccount {
         var keychainItem: KeychainItem
         var tokenData: Data
+        var oauthAccountData: Data?
     }
 
     // MARK: - Discovery
 
-    /// Returns the current Claude Code account from Keychain, including token data.
-    /// Uses /usr/bin/security which has ACL access to the item.
+    /// Returns the current Claude Code account from Keychain, including token data
+    /// and the `oauthAccount` snapshot from `~/.claude.json`.
     static func discoverAccounts() -> [DiscoveredAccount] {
         // Get account name (attributes only, no ACL needed)
         let items = KeychainService.listItems(service: keychainService)
@@ -71,21 +72,25 @@ struct ClaudeCodeSwitcher {
             return []
         }
 
+        // Read oauthAccount from ~/.claude.json (contains email, orgId, orgName)
+        let oauthAccountData = Self.readOAuthAccountFromClaudeJson()
+
         return items.map { item in
-            DiscoveredAccount(keychainItem: item, tokenData: tokenData)
+            DiscoveredAccount(keychainItem: item, tokenData: tokenData, oauthAccountData: oauthAccountData)
         }
     }
 
     // MARK: - Switching
 
-    /// Activates the given Claude Code account by writing its token into the Keychain.
-    /// Uses /usr/bin/security CLI to bypass ACL restrictions on the item.
+    /// Activates the given Claude Code account by:
+    /// 1. Writing its token into the Keychain
+    /// 2. Updating `oauthAccount` in `~/.claude.json` so `claude auth status` shows the right identity
     ///
     /// Important: We must delete ALL existing items for the service first, then add
     /// the new one. Using `-U` alone only matches by service+account, so switching
     /// from accountA to accountB would leave accountA's item in place and add a
     /// second item — Claude CLI then reads whichever comes first (the old one).
-    static func switchTo(account keychainAccount: String, tokenData: Data) throws {
+    static func switchTo(account keychainAccount: String, tokenData: Data, oauthAccountData: Data? = nil) throws {
         guard let jsonString = String(data: tokenData, encoding: .utf8) else {
             throw ClaudeCodeError.invalidTokenData
         }
@@ -106,11 +111,47 @@ struct ClaudeCodeSwitcher {
             "-a", keychainAccount,
             "-w", jsonString
         ])
+
+        // Update ~/.claude.json with the oauthAccount snapshot so
+        // `claude auth status` reports the correct email/org.
+        if let oauthData = oauthAccountData {
+            writeOAuthAccountToClaudeJson(oauthData)
+        }
     }
 
     /// Returns the currently active account identifier from Keychain, if any.
     static func activeAccount() -> String? {
         KeychainService.listItems(service: keychainService).first?.account
+    }
+
+    // MARK: - ~/.claude.json oauthAccount management
+
+    private static let claudeJsonURL: URL = {
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".claude.json")
+    }()
+
+    /// Reads the `oauthAccount` object from `~/.claude.json` and returns it as JSON Data.
+    static func readOAuthAccountFromClaudeJson() -> Data? {
+        guard let fileData = try? Data(contentsOf: claudeJsonURL),
+              let json = try? JSONSerialization.jsonObject(with: fileData) as? [String: Any],
+              let oauthAccount = json["oauthAccount"] else {
+            return nil
+        }
+        return try? JSONSerialization.data(withJSONObject: oauthAccount)
+    }
+
+    /// Writes the `oauthAccount` object into `~/.claude.json`, preserving all other fields.
+    static func writeOAuthAccountToClaudeJson(_ oauthData: Data) {
+        guard let oauthAccount = try? JSONSerialization.jsonObject(with: oauthData),
+              let fileData = try? Data(contentsOf: claudeJsonURL),
+              var json = try? JSONSerialization.jsonObject(with: fileData) as? [String: Any] else {
+            return
+        }
+        json["oauthAccount"] = oauthAccount
+        guard let updatedData = try? JSONSerialization.data(withJSONObject: json, options: [.sortedKeys]) else {
+            return
+        }
+        try? updatedData.write(to: claudeJsonURL, options: .atomic)
     }
 
     // MARK: - Session management

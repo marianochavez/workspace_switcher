@@ -434,6 +434,7 @@ private struct WorkspaceDetailView: View {
             if case .claudeCode(var payload) = acc.payload,
                payload.keychainAccount == account.keychainItem.account {
                 payload.tokenSnapshot = account.tokenData
+                payload.oauthAccountSnapshot = account.oauthAccountData
                 payload.label = lbl
                 ws.accounts[i].payload = .claudeCode(payload)
                 ws.accounts[i].displayName = lbl
@@ -449,7 +450,8 @@ private struct WorkspaceDetailView: View {
             payload: .claudeCode(ClaudeCodePayload(
                 keychainAccount: account.keychainItem.account,
                 label: lbl,
-                tokenSnapshot: account.tokenData
+                tokenSnapshot: account.tokenData,
+                oauthAccountSnapshot: account.oauthAccountData
             ))
         ))
         store.updateWorkspace(ws)

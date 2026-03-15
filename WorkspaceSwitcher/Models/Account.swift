@@ -14,6 +14,10 @@ struct ClaudeCodePayload: Codable, Equatable {
     /// Snapshot of the OAuth token data from Keychain at discovery time.
     /// Used to restore the credential when switching workspaces.
     var tokenSnapshot: Data?
+    /// Snapshot of the `oauthAccount` object from `~/.claude.json` at discovery time.
+    /// Claude CLI reads this to determine email, orgId, orgName for `auth status`.
+    /// Must be restored alongside the Keychain token when switching.
+    var oauthAccountSnapshot: Data?
 }
 
 struct GitHubPayload: Codable, Equatable {
