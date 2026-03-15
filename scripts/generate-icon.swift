@@ -147,16 +147,39 @@ func generateIcon(size: CGFloat) -> NSImage {
     return image
 }
 
-func savePNG(_ image: NSImage, to path: String) {
-    guard let tiffData = image.tiffRepresentation,
-          let bitmap = NSBitmapImageRep(data: tiffData),
-          let pngData = bitmap.representation(using: .png, properties: [:]) else {
-        print("ERROR: Failed to create PNG for \(path)")
+func savePNG(_ image: NSImage, to path: String, pixelSize: Int) {
+    // Create a bitmap rep with exact pixel dimensions (not points)
+    guard let bitmap = NSBitmapImageRep(
+        bitmapDataPlanes: nil,
+        pixelsWide: pixelSize,
+        pixelsHigh: pixelSize,
+        bitsPerSample: 8,
+        samplesPerPixel: 4,
+        hasAlpha: true,
+        isPlanar: false,
+        colorSpaceName: .deviceRGB,
+        bytesPerRow: 0,
+        bitsPerPixel: 0
+    ) else {
+        print("ERROR: Failed to create bitmap for \(path)")
+        return
+    }
+    bitmap.size = NSSize(width: pixelSize, height: pixelSize)
+
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
+    image.draw(in: NSRect(x: 0, y: 0, width: pixelSize, height: pixelSize),
+               from: NSRect(x: 0, y: 0, width: image.size.width, height: image.size.height),
+               operation: .copy, fraction: 1.0)
+    NSGraphicsContext.restoreGraphicsState()
+
+    guard let pngData = bitmap.representation(using: .png, properties: [:]) else {
+        print("ERROR: Failed to create PNG data for \(path)")
         return
     }
     do {
         try pngData.write(to: URL(fileURLWithPath: path))
-        print("  Created: \(path)")
+        print("  Created: \(path) (\(pixelSize)x\(pixelSize)px)")
     } catch {
         print("ERROR: \(error)")
     }
@@ -182,24 +205,13 @@ let assetDir = projectDir + "/WorkspaceSwitcher/Resources/Assets.xcassets/AppIco
 
 print("Generating app icons...")
 
-// Generate the master 1024px icon
+// Generate the master icon at high resolution
 let masterIcon = generateIcon(size: 1024)
 
 for entry in sizes {
     let filename = "icon_\(entry.size)x\(entry.size).png"
     let path = assetDir + "/" + filename
-
-    if entry.size == 1024 {
-        savePNG(masterIcon, to: path)
-    } else {
-        let resized = NSImage(size: NSSize(width: entry.size, height: entry.size))
-        resized.lockFocus()
-        masterIcon.draw(in: NSRect(x: 0, y: 0, width: entry.size, height: entry.size),
-                        from: NSRect(x: 0, y: 0, width: 1024, height: 1024),
-                        operation: .copy, fraction: 1.0)
-        resized.unlockFocus()
-        savePNG(resized, to: path)
-    }
+    savePNG(masterIcon, to: path, pixelSize: entry.size)
 }
 
 // Update Contents.json
