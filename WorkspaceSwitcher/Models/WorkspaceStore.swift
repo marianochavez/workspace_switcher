@@ -1,10 +1,11 @@
 import Foundation
+import Combine
 
-final class WorkspaceStore {
+final class WorkspaceStore: ObservableObject {
     static let shared = WorkspaceStore()
 
-    private(set) var workspaces: [Workspace] = []
-    private(set) var activeWorkspaceID: UUID?
+    @Published private(set) var workspaces: [Workspace] = []
+    @Published private(set) var activeWorkspaceID: UUID?
 
     /// Called after any mutation so UI can rebuild the menu.
     var onChange: (() -> Void)?

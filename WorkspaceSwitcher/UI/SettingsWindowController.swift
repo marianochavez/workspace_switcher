@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 final class SettingsWindowController: NSWindowController {
     var onClose: (() -> Void)?
@@ -7,18 +8,18 @@ final class SettingsWindowController: NSWindowController {
     init(store: WorkspaceStore) {
         self.store = store
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 620, height: 500),
+            contentRect: NSRect(x: 0, y: 0, width: 660, height: 520),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
         window.title = "Settings"
-        window.minSize = NSSize(width: 560, height: 420)
+        window.minSize = NSSize(width: 580, height: 440)
         window.center()
         super.init(window: window)
 
-        let vc = SettingsViewController(store: store)
-        window.contentViewController = vc
+        let settingsView = SettingsContentView(store: store)
+        window.contentView = NSHostingView(rootView: settingsView)
         window.delegate = self
     }
 

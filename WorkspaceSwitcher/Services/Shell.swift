@@ -55,10 +55,14 @@ struct Shell {
     }
 
     /// Launches a process and returns a handle that can be cancelled.
+    /// Wraps the command in a login shell so the user's full PATH (nvm, homebrew, etc.) is available.
     static func launchCancellable(_ launchPath: String, args: [String]) throws -> CancellableProcess {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: launchPath)
-        process.arguments = args
+        let escaped = ([launchPath] + args).map { arg in
+            "'\(arg.replacingOccurrences(of: "'", with: "'\\''"))'"
+        }.joined(separator: " ")
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-ilc", escaped]
         let stdout = Pipe()
         let stderr = Pipe()
         process.standardOutput = stdout
@@ -73,6 +77,8 @@ final class CancellableProcess: @unchecked Sendable {
     let process: Process
     private let stdout: Pipe
     private let stderr: Pipe
+    private var stderrAccumulator = Data()
+    private let lock = NSLock()
 
     init(process: Process, stdout: Pipe, stderr: Pipe) {
         self.process = process
@@ -80,14 +86,33 @@ final class CancellableProcess: @unchecked Sendable {
         self.stderr = stderr
     }
 
+    /// Observes stderr output in real time. The callback fires on a background queue
+    /// each time new data arrives. Call this *before* `waitForExit`.
+    func observeStderr(handler: @escaping (String) -> Void) {
+        stderr.fileHandleForReading.readabilityHandler = { [weak self] handle in
+            let data = handle.availableData
+            guard !data.isEmpty else { return }
+            self?.lock.lock()
+            self?.stderrAccumulator.append(data)
+            self?.lock.unlock()
+            if let text = String(data: data, encoding: .utf8) {
+                handler(text)
+            }
+        }
+    }
+
     /// Waits for the process to finish. Throws on non-zero exit.
     func waitForExit() async throws -> String {
-        try await Task.detached(priority: .userInitiated) { [process, stdout, stderr] in
+        try await Task.detached(priority: .userInitiated) { [process, stdout, stderr, lock] in
             process.waitUntilExit()
+            stderr.fileHandleForReading.readabilityHandler = nil
             let outData = stdout.fileHandleForReading.readDataToEndOfFile()
-            let errData = stderr.fileHandleForReading.readDataToEndOfFile()
+            // Read any remaining stderr data
+            let remaining = stderr.fileHandleForReading.readDataToEndOfFile()
+            lock.lock()
+            let errStr = String(data: remaining, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            lock.unlock()
             let outStr = String(data: outData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            let errStr = String(data: errData, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             guard process.terminationStatus == 0 else {
                 throw ShellError.nonZeroExit(process.terminationStatus, errStr.isEmpty ? outStr : errStr)
             }
@@ -97,6 +122,7 @@ final class CancellableProcess: @unchecked Sendable {
 
     /// Terminates the process immediately.
     func cancel() {
+        stderr.fileHandleForReading.readabilityHandler = nil
         if process.isRunning { process.terminate() }
     }
 }

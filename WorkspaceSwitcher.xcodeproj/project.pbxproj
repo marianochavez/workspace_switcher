@@ -31,11 +31,7 @@
 		A1000001000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000001000014 /* Assets.xcassets */; };
 		A1000001000015 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000001000015 /* Security.framework */; };
 		A1000001000016 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000001000016 /* ServiceManagement.framework */; };
-		A1000001000017 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000018 /* SettingsViewController.swift */; };
-		A1000001000018 /* WorkspaceSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000019 /* WorkspaceSidebarViewController.swift */; };
-		A1000001000019 /* WorkspaceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000020 /* WorkspaceDetailViewController.swift */; };
-		A1000001000020 /* IconPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000021 /* IconPickerViewController.swift */; };
-		A1000001000021 /* AddAccountSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000022 /* AddAccountSheetController.swift */; };
+		A1000001000023 /* SettingsContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000023 /* SettingsContentView.swift */; };
 		B80E0DD849037B3754CBA0FA /* WorkspaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E78730E0B6802290C29BC2 /* WorkspaceTests.swift */; };
 		DFAB4BD1664BFBB8EC5329F2 /* GitHubSwitcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA8E9A71C1B13666AC604B2 /* GitHubSwitcherTests.swift */; };
 /* End PBXBuildFile section */
@@ -74,11 +70,7 @@
 		A2000001000015 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		A2000001000016 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		A2000001000017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A2000001000018 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		A2000001000019 /* WorkspaceSidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSidebarViewController.swift; sourceTree = "<group>"; };
-		A2000001000020 /* WorkspaceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceDetailViewController.swift; sourceTree = "<group>"; };
-		A2000001000021 /* IconPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconPickerViewController.swift; sourceTree = "<group>"; };
-		A2000001000022 /* AddAccountSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountSheetController.swift; sourceTree = "<group>"; };
+		A2000001000023 /* SettingsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsContentView.swift; sourceTree = "<group>"; };
 		A2000001000099 /* WorkspaceSwitcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WorkspaceSwitcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0E78730E0B6802290C29BC2 /* WorkspaceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkspaceTests.swift; sourceTree = "<group>"; };
 		B2D496567F3D1B6C61F9E6BB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
@@ -169,11 +161,7 @@
 				A2000001000011 /* StatusBarController.swift */,
 				A2000001000012 /* MenuBuilder.swift */,
 				A2000001000013 /* SettingsWindowController.swift */,
-				A2000001000018 /* SettingsViewController.swift */,
-				A2000001000019 /* WorkspaceSidebarViewController.swift */,
-				A2000001000020 /* WorkspaceDetailViewController.swift */,
-				A2000001000021 /* IconPickerViewController.swift */,
-				A2000001000022 /* AddAccountSheetController.swift */,
+				A2000001000023 /* SettingsContentView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -353,11 +341,7 @@
 				A1000001000011 /* StatusBarController.swift in Sources */,
 				A1000001000012 /* MenuBuilder.swift in Sources */,
 				A1000001000013 /* SettingsWindowController.swift in Sources */,
-				A1000001000017 /* SettingsViewController.swift in Sources */,
-				A1000001000018 /* WorkspaceSidebarViewController.swift in Sources */,
-				A1000001000019 /* WorkspaceDetailViewController.swift in Sources */,
-				A1000001000020 /* IconPickerViewController.swift in Sources */,
-				A1000001000021 /* AddAccountSheetController.swift in Sources */,
+				A1000001000023 /* SettingsContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

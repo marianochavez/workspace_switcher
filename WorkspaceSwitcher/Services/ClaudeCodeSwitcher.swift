@@ -32,7 +32,8 @@ struct ClaudeCodeSwitcher {
         if let known = claudeCandidatePaths.first(where: { FileManager.default.isExecutableFile(atPath: $0) }) {
             return known
         }
-        if let found = try? Shell.run("/usr/bin/env", args: ["which", "claude"]), !found.isEmpty {
+        // Use an interactive login shell to resolve PATH (picks up nvm, homebrew, etc.)
+        if let found = try? Shell.run("/bin/zsh", args: ["-ilc", "which claude"]), !found.isEmpty {
             return found
         }
         return nil

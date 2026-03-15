@@ -73,6 +73,21 @@ final class ShellTests: XCTestCase {
         XCTAssertFalse(proc.process.isRunning)
     }
 
+    func testCancellableProcessObserveStderr() async throws {
+        let proc = try Shell.launchCancellable("/bin/sh", args: ["-c", "echo stderr_msg >&2"])
+        let expectation = XCTestExpectation(description: "stderr received")
+        var captured = ""
+
+        proc.observeStderr { text in
+            captured += text
+            expectation.fulfill()
+        }
+
+        _ = try? await proc.waitForExit()
+        await fulfillment(of: [expectation], timeout: 5)
+        XCTAssertTrue(captured.contains("stderr_msg"), "Expected stderr content, got: \(captured)")
+    }
+
     func testCancellableProcessThrowsOnNonZero() async {
         do {
             let proc = try Shell.launchCancellable("/bin/sh", args: ["-c", "exit 3"])

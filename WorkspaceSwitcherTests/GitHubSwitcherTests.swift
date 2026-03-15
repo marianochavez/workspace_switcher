@@ -78,6 +78,107 @@ final class GitHubSwitcherTests: XCTestCase {
         XCTAssertEqual(accounts[1].username, "user2")
     }
 
+    // MARK: - parseActiveAccount
+
+    func testParseActiveAccountFindsActive() {
+        let output = """
+        github.com
+          ✓ Logged in to github.com account personal-user (keyring)
+          - Active account: true
+          - Git operations protocol: https
+          - Token: gho_****
+          - Token scopes: 'gist', 'read:org', 'repo'
+
+          ✓ Logged in to github.com account work-user (keyring)
+          - Active account: false
+          - Git operations protocol: https
+          - Token: gho_****
+          - Token scopes: 'gist', 'read:org', 'repo'
+        """
+        let active = GitHubSwitcher.parseActiveAccount(output)
+        XCTAssertNotNil(active)
+        XCTAssertEqual(active?.username, "personal-user")
+        XCTAssertEqual(active?.hostname, "github.com")
+    }
+
+    func testParseActiveAccountSecondIsActive() {
+        let output = """
+        github.com
+          ✓ Logged in to github.com account user1 (keyring)
+          - Active account: false
+
+          ✓ Logged in to github.com account user2 (keyring)
+          - Active account: true
+        """
+        let active = GitHubSwitcher.parseActiveAccount(output)
+        XCTAssertNotNil(active)
+        XCTAssertEqual(active?.username, "user2")
+    }
+
+    func testParseActiveAccountEmptyOutput() {
+        let active = GitHubSwitcher.parseActiveAccount("")
+        XCTAssertNil(active)
+    }
+
+    func testParseActiveAccountSingleAccount() {
+        let output = """
+        github.com
+          ✓ Logged in to github.com account solo-user (keyring)
+          - Active account: true
+        """
+        let active = GitHubSwitcher.parseActiveAccount(output)
+        XCTAssertEqual(active?.username, "solo-user")
+    }
+
+    func testParseActiveAccountGHE() {
+        let output = """
+        ghe.company.com
+          ✓ Logged in to ghe.company.com account admin (keyring)
+          - Active account: true
+        """
+        let active = GitHubSwitcher.parseActiveAccount(output)
+        XCTAssertEqual(active?.username, "admin")
+        XCTAssertEqual(active?.hostname, "ghe.company.com")
+    }
+
+    // MARK: - parseDeviceCode
+
+    func testParseDeviceCodeFromStandardOutput() {
+        let text = "! First copy your one-time code: AB12-CD34"
+        let code = GitHubSwitcher.parseDeviceCode(from: text)
+        XCTAssertEqual(code, "AB12-CD34")
+    }
+
+    func testParseDeviceCodeVariousFormats() {
+        // With extra whitespace
+        XCTAssertEqual(GitHubSwitcher.parseDeviceCode(from: "code:  XXXX-YYYY"), "XXXX-YYYY")
+        // Standalone code
+        XCTAssertEqual(GitHubSwitcher.parseDeviceCode(from: "Enter this: A1B2-C3D4 on GitHub"), "A1B2-C3D4")
+    }
+
+    func testParseDeviceCodeNoMatch() {
+        XCTAssertNil(GitHubSwitcher.parseDeviceCode(from: "No code here"))
+        XCTAssertNil(GitHubSwitcher.parseDeviceCode(from: ""))
+        XCTAssertNil(GitHubSwitcher.parseDeviceCode(from: "ABCD"))  // No hyphen
+    }
+
+    func testParseDeviceCodeLowerCaseNoMatch() {
+        // Device codes are uppercase
+        XCTAssertNil(GitHubSwitcher.parseDeviceCode(from: "code: abcd-efgh"))
+    }
+
+    // MARK: - deviceURL
+
+    func testDeviceURLGitHubCom() {
+        let url = GitHubSwitcher.deviceURL()
+        XCTAssertEqual(url.absoluteString, "https://github.com/login/device")
+    }
+
+    func testDeviceURLGHE() {
+        let url = GitHubSwitcher.deviceURL(hostname: "ghe.company.com")
+        XCTAssertEqual(url.absoluteString, "https://ghe.company.com/login/device")
+    }
+
     // MARK: - ghPath
 
     func testGhPathFindsGhIfInstalled() {
