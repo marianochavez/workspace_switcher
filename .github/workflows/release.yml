@@ -22,7 +22,7 @@ jobs:
         run: |
           xcodebuild test \
             -project WorkspaceSwitcher.xcodeproj \
-            -scheme WorkspaceSwitcherTests \
+            -scheme WorkspaceSwitcher \
             -destination 'platform=macOS' \
             CODE_SIGN_IDENTITY="-"
 
