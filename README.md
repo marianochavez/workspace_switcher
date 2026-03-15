@@ -4,10 +4,10 @@
 
 ### Switch between Claude Code & GitHub accounts from your macOS menu bar
 
-[![Version](https://img.shields.io/github/v/release/marianochavez/workspace_switcher?label=version&color=blue)](https://github.com/marianochavez/workspace_switcher/releases)
+[![Latest Release](https://img.shields.io/github/v/release/marianochavez/workspace_switcher?include_prereleases&sort=semver&label=latest&color=blue)](https://github.com/marianochavez/workspace_switcher/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey.svg)](https://github.com/marianochavez/workspace_switcher/releases)
 [![Built with Swift](https://img.shields.io/badge/built%20with-Swift%20%7C%20SwiftUI-orange.svg)](https://developer.apple.com/swift/)
-[![License](https://img.shields.io/github/license/marianochavez/workspace_switcher)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 </div>
 
@@ -37,7 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/marianochavez/workspace_switcher/ma
 
 ### Manual Install
 
-> [![Download DMG](https://img.shields.io/github/v/release/marianochavez/workspace_switcher?label=Download%20DMG&color=success&style=for-the-badge)](https://github.com/marianochavez/workspace_switcher/releases/latest)
+> [![Download DMG](https://img.shields.io/github/v/release/marianochavez/workspace_switcher?include_prereleases&sort=semver&label=Download%20DMG&color=success&style=for-the-badge)](https://github.com/marianochavez/workspace_switcher/releases/latest)
 
 1. Download the latest **WorkspaceSwitcher-x.x.x.dmg** from [Releases](https://github.com/marianochavez/workspace_switcher/releases/latest)
 2. Open the DMG and drag **WorkspaceSwitcher** into your Applications folder
