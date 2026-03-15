@@ -8,59 +8,35 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey.svg)](https://github.com/marianochavez/workspace_switcher/releases)
 [![Built with Swift](https://img.shields.io/badge/built%20with-Swift%20%7C%20SwiftUI-orange.svg)](https://developer.apple.com/swift/)
 [![License](https://img.shields.io/github/license/marianochavez/workspace_switcher)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/marianochavez/workspace_switcher/ci.yml?label=CI)](https://github.com/marianochavez/workspace_switcher/actions/workflows/ci.yml)
 
 </div>
 
 ## Why WorkspaceSwitcher?
 
-Working with multiple Claude Code and GitHub accounts means constantly running `gh auth switch`, editing Keychain entries, and remembering which credentials go together. WorkspaceSwitcher groups your accounts into **workspaces** and switches them all with a single click from the menu bar.
+Working with multiple Claude Code and GitHub accounts means constantly running `gh auth switch`, editing Keychain entries, and remembering which credentials go together.
+
+**WorkspaceSwitcher** groups your accounts into workspaces and switches them all with a single click from the menu bar — no terminal needed.
+
+## Features
 
 - **One click, all accounts switch** — Claude Code + GitHub credentials swap together
 - **Native macOS menu bar app** — lightweight, no Electron, no background daemons
-- **Built-in auth flows** — GitHub device code and Claude OAuth login without leaving the app
+- **Built-in login** — GitHub device code and Claude OAuth flows without leaving the app
 - **Custom icons** — monochrome SF Symbols for the menu bar or colorful emoji
-
-## How It Works
-
-```
-  ┌───┐
-  │ 💼│  ← menu bar icon
-  └─┬─┘
-    │
-  ┌─▼───────────────────┐
-  │ ✓ Work          💼  │  ← active workspace
-  │   Personal      🏠  │
-  │ ─────────────────── │
-  │   Settings…     ⌘,  │
-  │   Quit          ⌘Q  │
-  └─────────────────────┘
-```
-
-| Step | Action |
-|------|--------|
-| **1. Create** | Open Settings → add a workspace → pick a name and icon |
-| **2. Link** | Click **GitHub** or **Claude Code** login → authenticate in your browser |
-| **3. Switch** | Click any workspace in the menu bar → all accounts switch instantly |
-
-**Under the hood**, switching a workspace:
-- Writes the matching Claude Code OAuth token into your macOS Keychain
-- Runs `gh auth switch --user <username>` to activate the correct GitHub account
+- **Launch at login** — starts automatically when you log in
 
 ## Installation
-
-### Download
 
 > [![Download DMG](https://img.shields.io/github/v/release/marianochavez/workspace_switcher?label=Download%20DMG&color=success&style=for-the-badge)](https://github.com/marianochavez/workspace_switcher/releases/latest)
 
 1. Download the latest **WorkspaceSwitcher-x.x.x.dmg** from [Releases](https://github.com/marianochavez/workspace_switcher/releases/latest)
-2. Open the DMG and drag **WorkspaceSwitcher** into `/Applications`
+2. Open the DMG and drag **WorkspaceSwitcher** into your Applications folder
 3. Launch the app — it appears in the menu bar (no Dock icon)
 
 <details>
 <summary><strong>macOS shows "unidentified developer" — how do I fix it?</strong></summary>
 
-The app is ad-hoc signed (no Apple Developer certificate). On first launch:
+The app is not notarized yet. On first launch:
 
 1. Close the warning dialog
 2. Go to **System Settings → Privacy & Security**
@@ -69,25 +45,9 @@ The app is ad-hoc signed (no Apple Developer certificate). On first launch:
 After that, the app opens normally.
 </details>
 
-### Build from Source
+## Requirements
 
-**Requirements:** [Xcode](https://developer.apple.com/xcode/) 15+ · macOS 13 (Ventura) or later
-
-```bash
-git clone https://github.com/marianochavez/workspace_switcher.git
-cd workspace_switcher
-
-# Option A: Open in Xcode and press Cmd+R
-open WorkspaceSwitcher.xcodeproj
-
-# Option B: Build the DMG installer
-bash scripts/build-dmg.sh
-open build/WorkspaceSwitcher.dmg
-```
-
-## Prerequisites
-
-WorkspaceSwitcher manages credentials for these CLI tools. Install the ones you use:
+Install the CLI tools you want to manage before using WorkspaceSwitcher:
 
 | Tool | Install | Used for |
 |------|---------|----------|
@@ -105,94 +65,54 @@ Click the menu bar icon → **Settings…** (or <kbd>Cmd</kbd> + <kbd>,</kbd>)
 ### 2. Create a Workspace
 
 Click **+** in the sidebar. Give it a name and choose an icon:
-- **Menu Bar** tab — monochrome SF Symbols (look native in the macOS status bar)
-- **Custom** tab — colorful emoji
+- **Menu Bar** — monochrome icons that look native in the macOS status bar
+- **Custom** — colorful emoji
 
 ### 3. Add Accounts
 
-Use the **Add Accounts** cards in the workspace detail view:
+Use the **Add Accounts** cards in the workspace detail:
 
-| Provider | Auth Flow |
-|----------|-----------|
-| **GitHub** | Runs `gh auth login`. The app captures the device code, copies it to your clipboard, and opens GitHub in the browser. |
-| **Claude Code** | Runs `claude auth login`. Complete the OAuth flow in your browser. |
+| Provider | What happens |
+|----------|--------------|
+| **GitHub** | The app starts `gh auth login`, shows your one-time device code, copies it to the clipboard, and opens GitHub in the browser. |
+| **Claude Code** | The app starts `claude auth login`. Complete the OAuth flow in your browser. |
 
-The app automatically detects which account was just authenticated and adds it to the workspace.
+Accounts that are already added show a green checkmark.
 
 ### 4. Switch
 
-Click any workspace name in the menu bar dropdown. Done.
-
-## Architecture
+Click any workspace in the menu bar dropdown. All associated accounts switch instantly.
 
 ```
-WorkspaceSwitcher/
-├── App/                # main.swift, AppDelegate
-├── Models/             # Workspace, Account, WorkspaceStore (ObservableObject)
-├── Services/
-│   ├── ClaudeCodeSwitcher  # Keychain read/write via /usr/bin/security
-│   ├── GitHubSwitcher      # gh auth status/switch/login
-│   ├── SwitcherService     # Orchestrates multi-account switching
-│   ├── KeychainService     # SecItem wrapper
-│   └── Shell               # Process launcher with login-shell PATH support
-├── UI/
-│   ├── StatusBarController  # NSStatusItem (AppKit)
-│   ├── MenuBuilder          # Dynamic menu construction (AppKit)
-│   ├── SettingsWindowController  # NSWindow shell (AppKit)
-│   └── SettingsContentView      # Full settings UI (SwiftUI)
-└── Resources/          # Assets.xcassets, Info.plist
+  ┌───┐
+  │ 💼│  ← menu bar
+  └─┬─┘
+    │
+  ┌─▼───────────────────┐
+  │ ✓ Work          💼  │
+  │   Personal      🏠  │
+  │ ─────────────────── │
+  │   Settings…     ⌘,  │
+  │   Quit          ⌘Q  │
+  └─────────────────────┘
 ```
-
-> **Design:** The menu bar and window shell use AppKit; all settings content is SwiftUI via `NSHostingView`.
-
-## Development
-
-```bash
-# Run tests (78 tests)
-xcodebuild test \
-  -project WorkspaceSwitcher.xcodeproj \
-  -scheme WorkspaceSwitcher \
-  -destination 'platform=macOS' \
-  CODE_SIGN_IDENTITY="-"
-
-# Regenerate app icon (all sizes from 16px to 1024px)
-swift scripts/generate-icon.swift
-
-# Build DMG installer
-bash scripts/build-dmg.sh
-```
-
-## Releasing
-
-Push a version tag to trigger the [release workflow](.github/workflows/release.yml):
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The CI pipeline will:
-1. Run the full test suite
-2. Build a Release archive
-3. Package the `.dmg` installer
-4. Create a GitHub Release with the DMG attached
 
 ## FAQ
 
 <details>
 <summary><strong>Does it store my tokens or passwords?</strong></summary>
 
-WorkspaceSwitcher stores Claude Code OAuth token snapshots in `~/Library/Application Support/WorkspaceSwitcher/workspaces.json`. GitHub credentials are managed entirely by the `gh` CLI and its own keyring — WorkspaceSwitcher only calls `gh auth switch`.
+Claude Code OAuth token snapshots are stored locally in `~/Library/Application Support/WorkspaceSwitcher/`. GitHub credentials are managed entirely by the `gh` CLI — WorkspaceSwitcher only tells it which account to activate.
 </details>
 
 <details>
 <summary><strong>Can I have the same account in multiple workspaces?</strong></summary>
 
-Yes. For example, you can have the same GitHub account in both "Work" and "Personal" workspaces, paired with different Claude Code accounts.
+Yes. For example, you can use the same GitHub account in both "Work" and "Personal", paired with different Claude Code accounts.
 </details>
 
 <details>
-<summary><strong>What happens if I switch workspaces while Claude Code is running?</strong></summary>
+<summary><strong>What happens if I switch while Claude Code is running?</strong></summary>
 
 WorkspaceSwitcher detects running Claude Code sessions and warns you before switching. The credential change takes effect on the next Claude Code invocation.
 </details>
@@ -200,7 +120,17 @@ WorkspaceSwitcher detects running Claude Code sessions and warns you before swit
 <details>
 <summary><strong>Does it work with GitHub Enterprise?</strong></summary>
 
-Yes. When logging in with GitHub, the `gh` CLI supports custom hostnames. Accounts from any GitHub Enterprise instance will be detected and managed.
+Yes. The `gh` CLI supports custom hostnames, and WorkspaceSwitcher will detect and manage accounts from any GitHub Enterprise instance.
+</details>
+
+<details>
+<summary><strong>How do I uninstall?</strong></summary>
+
+1. Quit WorkspaceSwitcher from the menu bar
+2. Delete `WorkspaceSwitcher.app` from your Applications folder
+3. Optionally remove saved data: `rm -rf ~/Library/Application\ Support/WorkspaceSwitcher`
+
+Your CLI tools will continue working normally with whatever account was last active.
 </details>
 
 ## License
