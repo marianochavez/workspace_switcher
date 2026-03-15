@@ -43,6 +43,7 @@ private struct SidebarView: View {
             }
         }
         .listStyle(.sidebar)
+        .onAppear { refreshLaunchAtLogin() }
         .safeAreaInset(edge: .top) {
             VStack(spacing: 0) {
                 Toggle("Launch at login", isOn: launchAtLoginBinding)
@@ -52,6 +53,11 @@ private struct SidebarView: View {
                     .padding(.vertical, 8)
                 Divider()
             }
+        }
+        .alert("Launch at Login", isPresented: $showLaunchAtLoginError) {
+            Button("OK") {}
+        } message: {
+            Text(launchAtLoginErrorMessage)
         }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 0) {
@@ -98,21 +104,31 @@ private struct SidebarView: View {
         selection = nil
     }
 
+    @State private var launchAtLogin = false
+    @State private var showLaunchAtLoginError = false
+    @State private var launchAtLoginErrorMessage = ""
+
+    private func refreshLaunchAtLogin() {
+        if #available(macOS 13.0, *) {
+            launchAtLogin = SMAppService.mainApp.status == .enabled
+        }
+    }
+
     private var launchAtLoginBinding: Binding<Bool> {
         Binding(
-            get: {
-                if #available(macOS 13.0, *) {
-                    return SMAppService.mainApp.status == .enabled
-                }
-                return false
-            },
+            get: { launchAtLogin },
             set: { newValue in
                 guard #available(macOS 13.0, *) else { return }
                 do {
                     if newValue { try SMAppService.mainApp.register() }
                     else { try SMAppService.mainApp.unregister() }
+                    launchAtLogin = newValue
                 } catch {
                     report(error)
+                    launchAtLoginErrorMessage = error.localizedDescription
+                    showLaunchAtLoginError = true
+                    // Revert the toggle
+                    launchAtLogin = SMAppService.mainApp.status == .enabled
                 }
             }
         )
