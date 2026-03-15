@@ -60,17 +60,6 @@ xattr -dr com.apple.quarantine /Applications/WorkspaceSwitcher.app
 After that, the app opens normally.
 </details>
 
-## Requirements
-
-Install the CLI tools you want to manage before using WorkspaceSwitcher:
-
-| Tool | Install | Used for |
-|------|---------|----------|
-| [GitHub CLI](https://cli.github.com) | `brew install gh` | Switching GitHub accounts |
-| [Claude Code](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` | Switching Claude Code accounts |
-
-> Both tools must be authenticated at least once before WorkspaceSwitcher can manage them.
-
 ## Getting Started
 
 ### 1. Open Settings
