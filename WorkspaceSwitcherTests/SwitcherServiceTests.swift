@@ -44,6 +44,21 @@ final class SwitcherServiceTests: XCTestCase {
     // MARK: - switchTo with valid Claude token (using test keychain)
 
     func testSwitchToClaudeWithTokenCallsSwitcher() async throws {
+        // Save existing credentials so the test can restore them afterwards.
+        // switchTo() deletes ALL items for the service before writing, so
+        // without this the test would destroy real credentials.
+        let service = "Claude Code-credentials"
+        let existingItems = KeychainService.listItems(service: service)
+        var savedCredentials: [(account: String, token: String)] = []
+        for item in existingItems {
+            if let token = try? Shell.run("/usr/bin/security", args: [
+                "find-generic-password", "-s", service, "-a", item.account, "-w"
+            ]) {
+                savedCredentials.append((item.account, token))
+            }
+        }
+
+        let testAccount = "WorkspaceSwitcherTest-\(UUID().uuidString)"
         let testToken = """
         {"claudeAiOauth":{"accessToken":"sk-test","refreshToken":"rt-test","expiresAt":9999999999,"subscriptionType":"test"}}
         """
@@ -53,11 +68,25 @@ final class SwitcherServiceTests: XCTestCase {
         ws.accounts.append(Account(
             displayName: "TestClaude",
             payload: .claudeCode(ClaudeCodePayload(
-                keychainAccount: "test-user",
+                keychainAccount: testAccount,
                 label: "Test",
                 tokenSnapshot: Data(testToken.utf8)
             ))
         ))
+
+        defer {
+            // Clean up test entry
+            try? Shell.run("/usr/bin/security", args: [
+                "delete-generic-password", "-s", service, "-a", testAccount
+            ])
+            // Restore original credentials
+            for cred in savedCredentials {
+                try? Shell.run("/usr/bin/security", args: [
+                    "add-generic-password", "-U",
+                    "-s", service, "-a", cred.account, "-w", cred.token
+                ])
+            }
+        }
 
         // switchTo attempts to write to Keychain via security CLI.
         // It may fail due to ACL restrictions in test environments,
