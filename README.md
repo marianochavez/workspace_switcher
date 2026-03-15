@@ -27,6 +27,16 @@ Working with multiple Claude Code and GitHub accounts means constantly running `
 
 ## Installation
 
+### Quick Install (recommended)
+
+Run this in your terminal — it downloads, installs, and removes the macOS quarantine warning automatically:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/marianochavez/workspace_switcher/main/scripts/install.sh | bash
+```
+
+### Manual Install
+
 > [![Download DMG](https://img.shields.io/github/v/release/marianochavez/workspace_switcher?label=Download%20DMG&color=success&style=for-the-badge)](https://github.com/marianochavez/workspace_switcher/releases/latest)
 
 1. Download the latest **WorkspaceSwitcher-x.x.x.dmg** from [Releases](https://github.com/marianochavez/workspace_switcher/releases/latest)
@@ -34,13 +44,18 @@ Working with multiple Claude Code and GitHub accounts means constantly running `
 3. Launch the app — it appears in the menu bar (no Dock icon)
 
 <details>
-<summary><strong>macOS shows "unidentified developer" — how do I fix it?</strong></summary>
+<summary><strong>macOS shows a security warning on first launch</strong></summary>
 
-The app is not notarized yet. On first launch:
+The app is not notarized with Apple yet. To open it:
 
 1. Close the warning dialog
 2. Go to **System Settings → Privacy & Security**
 3. Click **"Open Anyway"**
+
+Or remove the quarantine flag manually:
+```bash
+xattr -dr com.apple.quarantine /Applications/WorkspaceSwitcher.app
+```
 
 After that, the app opens normally.
 </details>
