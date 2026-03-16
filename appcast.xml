@@ -1,1 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?><rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"><channel><title>WorkspaceSwitcher</title></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>WorkspaceSwitcher</title>
+        <item>
+            <title>1.1.0</title>
+            <pubDate>Mon, 16 Mar 2026 03:05:33 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/marianochavez/workspace_switcher/releases/download/v1.1.0/WorkspaceSwitcher-1.1.0.dmg" length="1393603" type="application/octet-stream" sparkle:edSignature="OR6qMsOvDQDQhMroe6/ZmLgWKTrIH/Faln2Ub7LXYRAKBKe8Lql4jcat+yG0S58vY4XJ1m6Jk1TauJjvKJmwBQ=="/>
+        </item>
+    </channel>
+</rss>
