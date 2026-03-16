@@ -45,6 +45,7 @@ private struct SidebarView: View {
                 }
                 .tag(workspace.id)
             }
+            .onMove { store.moveWorkspace(from: $0, to: $1) }
         }
         .listStyle(.sidebar)
         .onAppear { refreshLaunchAtLogin() }
