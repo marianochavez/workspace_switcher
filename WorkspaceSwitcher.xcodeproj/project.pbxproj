@@ -32,6 +32,8 @@
 		A1000001000015 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000001000015 /* Security.framework */; };
 		A1000001000016 /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000001000016 /* ServiceManagement.framework */; };
 		A1000001000023 /* SettingsContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000023 /* SettingsContentView.swift */; };
+		A1000001000024 /* UpdaterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001000024 /* UpdaterController.swift */; };
+		A1000001000025 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = SP000001000002 /* Sparkle */; };
 		B80E0DD849037B3754CBA0FA /* WorkspaceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0E78730E0B6802290C29BC2 /* WorkspaceTests.swift */; };
 		DFAB4BD1664BFBB8EC5329F2 /* GitHubSwitcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA8E9A71C1B13666AC604B2 /* GitHubSwitcherTests.swift */; };
 /* End PBXBuildFile section */
@@ -71,6 +73,7 @@
 		A2000001000016 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		A2000001000017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A2000001000023 /* SettingsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsContentView.swift; sourceTree = "<group>"; };
+		A2000001000024 /* UpdaterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterController.swift; sourceTree = "<group>"; };
 		A2000001000099 /* WorkspaceSwitcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WorkspaceSwitcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0E78730E0B6802290C29BC2 /* WorkspaceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkspaceTests.swift; sourceTree = "<group>"; };
 		B2D496567F3D1B6C61F9E6BB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
@@ -95,6 +98,7 @@
 			files = (
 				A1000001000015 /* Security.framework in Frameworks */,
 				A1000001000016 /* ServiceManagement.framework in Frameworks */,
+				A1000001000025 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +133,7 @@
 			children = (
 				A2000001000001 /* AppDelegate.swift */,
 				A2000001000002 /* main.swift */,
+				A2000001000024 /* UpdaterController.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -252,6 +257,9 @@
 			dependencies = (
 			);
 			name = WorkspaceSwitcher;
+			packageProductDependencies = (
+				SP000001000002 /* Sparkle */,
+			);
 			productName = WorkspaceSwitcher;
 			productReference = A2000001000099 /* WorkspaceSwitcher.app */;
 			productType = "com.apple.product-type.application";
@@ -283,6 +291,9 @@
 			productRefGroup = A4000001000020 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				SP000001000001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			targets = (
 				A5000001000001 /* WorkspaceSwitcher */,
 				53064A1CBC4A37B2CD5FA29B /* WorkspaceSwitcherTests */,
@@ -342,6 +353,7 @@
 				A1000001000012 /* MenuBuilder.swift in Sources */,
 				A1000001000013 /* SettingsWindowController.swift in Sources */,
 				A1000001000023 /* SettingsContentView.swift in Sources */,
+				A1000001000024 /* UpdaterController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,6 +588,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		SP000001000001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		SP000001000002 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = SP000001000001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A6000001000001 /* Project object */;
 }

@@ -24,5 +24,11 @@
 	<string>NSApplication</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
+	<key>SUFeedURL</key>
+	<string>https://marianochavez.github.io/workspace_switcher/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>FhiAajXnowyuzoHGBN9rIfPTthY9Kxs8EbKIZAnYeMw=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 </dict>
 </plist>

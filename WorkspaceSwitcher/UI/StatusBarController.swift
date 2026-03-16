@@ -3,10 +3,12 @@ import AppKit
 final class StatusBarController {
     private let statusItem: NSStatusItem
     private let store: WorkspaceStore
+    private let updaterController: UpdaterController?
     private var settingsWindowController: SettingsWindowController?
 
-    init(store: WorkspaceStore) {
+    init(store: WorkspaceStore, updaterController: UpdaterController? = nil) {
         self.store = store
+        self.updaterController = updaterController
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         store.onChange = { [weak self] in
             DispatchQueue.main.async { self?.rebuildMenu() }
@@ -40,6 +42,7 @@ final class StatusBarController {
         updateIcon()
         let menu = MenuBuilder.build(
             store: store,
+            updaterController: updaterController,
             onSwitch: { [weak self] workspace in
                 guard let self else { return }
                 SwitcherService.switchAndNotify(workspace: workspace, store: self.store)

@@ -45,6 +45,51 @@ jobs:
       - name: Rename DMG with version
         run: mv build/WorkspaceSwitcher.dmg build/WorkspaceSwitcher-${{ steps.version.outputs.VERSION }}.dmg
 
+      - name: Download Sparkle tools
+        run: |
+          curl -L -o Sparkle.tar.xz "https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz"
+          mkdir -p sparkle-tools
+          tar xf Sparkle.tar.xz -C sparkle-tools
+
+      - name: Generate appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          mkdir -p appcast-staging
+          cp build/WorkspaceSwitcher-${{ steps.version.outputs.VERSION }}.dmg appcast-staging/
+
+          # Fetch existing appcast for merge
+          git fetch origin gh-pages || true
+          git show origin/gh-pages:appcast.xml > appcast-staging/appcast.xml 2>/dev/null || true
+
+          DOWNLOAD_URL="https://github.com/marianochavez/workspace_switcher/releases/download/v${{ steps.version.outputs.VERSION }}"
+          echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle_private_key
+
+          ./sparkle-tools/bin/generate_appcast \
+            --ed-key-file /tmp/sparkle_private_key \
+            --download-url-prefix "$DOWNLOAD_URL/" \
+            appcast-staging/
+
+          rm -f /tmp/sparkle_private_key
+
+      - name: Update GitHub Pages appcast
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          TMPDIR=$(mktemp -d)
+          git worktree add "$TMPDIR" origin/gh-pages
+
+          cp appcast-staging/appcast.xml "$TMPDIR/appcast.xml"
+
+          cd "$TMPDIR"
+          git add appcast.xml
+          git commit -m "Update appcast for v${{ steps.version.outputs.VERSION }}" || echo "No changes"
+          git push origin HEAD:gh-pages
+
+          cd -
+          git worktree remove "$TMPDIR"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

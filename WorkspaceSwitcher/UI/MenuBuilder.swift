@@ -1,8 +1,10 @@
 import AppKit
+import Sparkle
 
 struct MenuBuilder {
     static func build(
         store: WorkspaceStore,
+        updaterController: UpdaterController? = nil,
         onSwitch: @escaping (Workspace) -> Void,
         onSettings: @escaping () -> Void
     ) -> NSMenu {
@@ -27,6 +29,16 @@ struct MenuBuilder {
         settingsItem.representedObject = settingsAction
         settingsItem.target = settingsAction
         menu.addItem(settingsItem)
+
+        if let updaterController {
+            let updateItem = NSMenuItem(
+                title: "Check for Updates…",
+                action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                keyEquivalent: ""
+            )
+            updateItem.target = updaterController.updaterController
+            menu.addItem(updateItem)
+        }
 
         let quitItem = NSMenuItem(title: "Quit WorkspaceSwitcher", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         quitItem.target = NSApp
