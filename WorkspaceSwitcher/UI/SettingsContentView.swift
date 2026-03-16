@@ -8,18 +8,22 @@ struct SettingsContentView: View {
     @State private var selectedWorkspaceID: UUID?
 
     var body: some View {
-        NavigationSplitView {
+        HSplitView {
             SidebarView(store: store, selection: $selectedWorkspaceID)
-        } detail: {
-            if let id = selectedWorkspaceID,
-               store.workspaces.contains(where: { $0.id == id }) {
-                WorkspaceDetailView(store: store, workspaceID: id)
-                    .id(id)
-            } else {
-                Text("Select or add a workspace")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(minWidth: 180, idealWidth: 200, maxWidth: 220)
+
+            Group {
+                if let id = selectedWorkspaceID,
+                   store.workspaces.contains(where: { $0.id == id }) {
+                    WorkspaceDetailView(store: store, workspaceID: id)
+                        .id(id)
+                } else {
+                    Text("Select or add a workspace")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -45,14 +49,11 @@ private struct SidebarView: View {
         .listStyle(.sidebar)
         .onAppear { refreshLaunchAtLogin() }
         .safeAreaInset(edge: .top) {
-            VStack(spacing: 0) {
-                Toggle("Launch at login", isOn: launchAtLoginBinding)
-                    .toggleStyle(.checkbox)
-                    .font(.system(size: 11))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                Divider()
-            }
+            Toggle("Launch at login", isOn: launchAtLoginBinding)
+                .toggleStyle(.checkbox)
+                .font(.system(size: 11))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
         }
         .alert("Launch at Login", isPresented: $showLaunchAtLoginError) {
             Button("OK") {}
