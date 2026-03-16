@@ -74,7 +74,8 @@ final class ShellTests: XCTestCase {
     }
 
     func testCancellableProcessObserveStderr() async throws {
-        let proc = try Shell.launchCancellable("/bin/sh", args: ["-c", "echo stderr_msg >&2"])
+        // Use sleep to keep process alive while observer is attached
+        let proc = try Shell.launchCancellable("/bin/sh", args: ["-c", "sleep 0.1; echo stderr_msg >&2"])
         let expectation = XCTestExpectation(description: "stderr received")
         var captured = ""
 
