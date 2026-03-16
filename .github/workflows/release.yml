@@ -63,14 +63,17 @@ jobs:
           git show origin/gh-pages:appcast.xml > appcast-staging/appcast.xml 2>/dev/null || true
 
           DOWNLOAD_URL="https://github.com/marianochavez/workspace_switcher/releases/download/v${{ steps.version.outputs.VERSION }}"
-          echo "$SPARKLE_PRIVATE_KEY" > /tmp/sparkle_private_key
+
+          # Write key without trailing newline to avoid corrupting base64
+          KEY_FILE=$(mktemp)
+          printf '%s' "$SPARKLE_PRIVATE_KEY" > "$KEY_FILE"
 
           ./sparkle-tools/bin/generate_appcast \
-            --ed-key-file /tmp/sparkle_private_key \
+            --ed-key-file "$KEY_FILE" \
             --download-url-prefix "$DOWNLOAD_URL/" \
             appcast-staging/
 
-          rm -f /tmp/sparkle_private_key
+          rm -f "$KEY_FILE"
 
       - name: Update GitHub Pages appcast
         run: |
