@@ -11,6 +11,19 @@
 
 </div>
 
+<div align="center">
+<table>
+<tr>
+<td align="center"><strong>Menu Bar</strong></td>
+<td align="center"><strong>Settings</strong></td>
+</tr>
+<tr>
+<td><img src="assets/screenshot-menubar.png" alt="Menu Bar dropdown" width="280"></td>
+<td><img src="assets/screenshot-settings.png" alt="Settings window" width="380"></td>
+</tr>
+</table>
+</div>
+
 ## Why WorkspaceSwitcher?
 
 Working with multiple Claude Code and GitHub accounts means constantly running `gh auth switch`, editing Keychain entries, and remembering which credentials go together.
@@ -86,20 +99,6 @@ Accounts that are already added show a green checkmark.
 ### 4. Switch
 
 Click any workspace in the menu bar dropdown. All associated accounts switch instantly.
-
-```
-  ┌───┐
-  │ 💼│  ← menu bar
-  └─┬─┘
-    │
-  ┌─▼───────────────────┐
-  │ ✓ Work          💼  │
-  │   Personal      🏠  │
-  │ ─────────────────── │
-  │   Settings…     ⌘,  │
-  │   Quit          ⌘Q  │
-  └─────────────────────┘
-```
 
 ## FAQ
 
